@@ -27,6 +27,14 @@ button:active{transform:scale(.98)}
 .mini{min-height:36px;font-size:13px;padding:0 12px;align-self:flex-end}
 .danger{border:2px solid var(--acc);color:var(--acc);font-weight:700;animation:glow 1.4s ease-in-out infinite}
 @keyframes glow{0%,100%{box-shadow:0 0 4px var(--acc)}50%{box-shadow:0 0 16px var(--acc)}}
+.tm{display:none;text-align:center;font-weight:800;font-size:26px}
+.tm.low{color:var(--acc)}
+#cardwrap{text-align:center;animation:pop .6s ease-out}
+#cardwrap img{width:100%;max-width:380px;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+#cardwrap .row2{display:flex;gap:8px;margin-top:10px}
+#cardwrap button{flex:1;min-height:46px;font-size:15px;font-weight:700}
+#cardwrap .hint{font-size:12px;color:var(--sub);margin-top:6px}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
 button:disabled{opacity:.6}
 .big{background:var(--acc);color:#fff;border:none;font-weight:700}
 </style>
@@ -34,6 +42,7 @@ button:disabled{opacity:.6}
 <body>
 <div class="wrap">
   <button id="bgm" class="mini">🔇 音：OFF</button>
+  <div id="tm" class="tm"></div>
   <div><div class="row"><span id="pn">あなた</span><span id="php"></span></div><div class="bar"><i id="pbar"></i></div></div>
   <div class="stage"><div id="em"></div><div class="row" style="justify-content:center;gap:8px"><span id="en"></span><span id="ehp"></span></div><div class="bar"><i id="ebar"></i></div></div>
   <div id="msg"></div>
@@ -61,7 +70,17 @@ const C={
 "宇都宮市":{e:"🥟",hp:75,geo:1,s:[52,2.7,0.9,103,417,1250,20,1.4,70,70]},
 "大分市":{e:"♨️",hp:75,geo:1,s:[48,2.4,0.9,103,502,950,12,0.9,72,70]},
 "金沢市":{e:"✨",hp:75,geo:1,s:[46,2.4,0.9,103,469,980,20,0.8,78,80]},
-"つくば市":{e:"🚀",hp:65,geo:1,s:[25,1.3,0.4,105,284,880,5,1.4,80,75]}
+"つくば市":{e:"🚀",hp:65,geo:1,s:[25,1.3,0.4,105,284,880,5,1.4,80,75]},
+"姫路市":{e:"🏰",hp:75,en:1,s:[53,2.4,0.8,100,534,990,10,0.8,74,80]},
+"鹿児島市":{e:"🌋",hp:80,en:1,s:[59,2.4,0.9,104,547,1080,8,0.6,72,80]},
+"川口市":{e:"⚙️",hp:75,en:1,s:[59,1.9,0.8,88,62,9500,5,3.8,68,70]},
+"船橋市":{e:"⛵",hp:80,en:1,s:[64,1.9,1.0,86,86,7400,8,2,75,78]},
+"静岡市":{e:"🍵",hp:85,en:1,s:[69,3,1.0,101,1412,490,15,0.9,76,80]},
+"浜松市":{e:"🎹",hp:90,en:1,s:[80,3.4,1.1,100,1558,510,20,2.5,74,80]},
+"新潟市":{e:"🌾",hp:90,en:1,ta:1,s:[79,3.5,1.1,101,726,1090,20,0.7,72,82]},
+"堺市":{e:"🏺",hp:95,en:1,ta:1,s:[83,3.4,1.2,90,150,5500,15,1.4,62,55]},
+"北九州市":{e:"🔩",hp:95,en:1,ta:1,s:[94,3.7,1.3,100,492,1910,20,1.3,62,60]},
+"千葉市":{e:"🥜",hp:100,en:1,ta:1,s:[98,4.3,1.5,98,272,3600,30,3.4,72,75]}
 };
 const ALL=Object.keys(C);
 const M=["人口","GDP","小売","昼夜間人口比","面積","人口密度","本社数","外国人人口","幸福度","治安"];
@@ -83,6 +102,7 @@ const QZ={
 };
 Object.assign(QZ,{"相模原市":[["相模原市が政令指定都市になった年は？",["2010年","1995年","2020年"],0],["相模原市の区の数は？",["3区","5区","7区"],0],["相模原市緑区にある湖は？",["相模湖","芦ノ湖","河口湖"],0],["「はやぶさ」の運用で知られる、相模原市にある研究所は？",["宇宙科学研究所","気象研究所","防災科学技術研究所"],0],["相模原市の人口は神奈川県内で何番目に多い？",["3番目","1番目","5番目"],0],["リニア中央新幹線の神奈川県駅が設置される予定の駅は？",["橋本駅","相模大野駅","町田駅"],0],["相模原市を流れる大きな川は？",["相模川","多摩川","酒匂川"],0],["相模原市の昼夜間人口比は100より？",["小さい","大きい","ちょうど100"],0],["相模原市の北部は、東京都のほか何県と接している？",["山梨県","静岡県","長野県"],0],["相模原市にあるJAXAの正式名称は？",["宇宙航空研究開発機構","国立天文台","気象庁"],0]],"八王子市":[["ミシュランで三つ星に選ばれた、八王子市の山は？",["高尾山","富士山","筑波山"],0],["八王子市の人口は、東京都の市部で？",["最も多い","2番目","5番目"],0],["八王子市が「桑都」と呼ばれたのは、何の産業が栄えたから？",["織物","製鉄","漁業"],0],["八王子市に多く集まっているのは？",["大学","港","空港"],0],["八王子駅に乗り入れるJRの路線は？",["中央線","東海道線","山手線"],0],["八王子市を流れる川は？",["浅川","隅田川","荒川"],0],["八王子市の甲州街道沿いで有名な並木は？",["イチョウ","サクラ","ケヤキ"],0],["八王子市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["八王子市の昼夜間人口比は100より？",["小さい","大きい","ちょうど100"],0],["高尾山の薬王院のシンボルは？",["天狗","河童","鬼"],0]],"岡山市":[["岡山県が名乗る愛称は？",["晴れの国","杜の都","水の都"],0],["岡山市にある日本三名園の一つは？",["後楽園","兼六園","偕楽園"],0],["岡山城の別名は？",["烏城","鯉城","鶴城"],0],["岡山県が名産地として知られるフルーツは？",["白桃","りんご","みかん"],0],["岡山が舞台といわれる昔話は？",["桃太郎","浦島太郎","かぐや姫"],0],["岡山市を流れる川は？",["旭川","利根川","筑後川"],0],["岡山市の人口は中国地方の市で何番目？",["2番目","1番目","3番目"],0],["岡山県と香川県を結ぶ橋は？",["瀬戸大橋","明石海峡大橋","レインボーブリッジ"],0],["岡山市の区の数は？",["4区","7区","10区"],0],["岡山の郷土料理として有名な寿司は？",["ばら寿司","柿の葉寿司","笹寿司"],0]],"熊本市":[["熊本県のPRキャラクターは？",["くまモン","ひこにゃん","ふなっしー"],0],["熊本城を築いた武将は？",["加藤清正","伊達政宗","前田利家"],0],["熊本県にある世界最大級のカルデラ火山は？",["阿蘇山","桜島","浅間山"],0],["熊本市の名物として有名な肉料理は？",["馬刺し","牛タン","ジンギスカン"],0],["熊本市の人口は九州の市で何番目に多い？",["3番目","1番目","5番目"],0],["熊本市の区の数は？",["5区","7区","10区"],0],["熊本市の水道水のすべてをまかなっているのは？",["地下水","ダムの水","海水"],0],["熊本市の中心部を走る乗り物は？",["路面電車","モノレール","ロープウェイ"],0],["熊本市の愛称として知られるのは？",["森の都","水の都","港の都"],0],["熊本市の昼夜間人口比は100より？",["大きい","小さい","ちょうど100"],0]]});
 Object.assign(QZ,{"宇都宮市":[["宇都宮市の名物として有名な料理は？",["餃子","ジンギスカン","たこ焼き"],0],["2023年に開業した、宇都宮市の次世代型路面電車は？",["ライトライン","ゆりかもめ","ポートライナー"],0],["宇都宮市の特産で、建築材に使われる石は？",["大谷石","大理石","御影石"],0],["宇都宮市の人口は、北関東（栃木・群馬・茨城）の市で？",["最も多い","2番目","3番目"],0],["宇都宮市を本拠地とするバスケットボールのクラブは？",["宇都宮ブレックス","千葉ジェッツ","琉球ゴールデンキングス"],0],["宇都宮駅に停まる新幹線は？",["東北新幹線","東海道新幹線","北陸新幹線"],0],["宇都宮市の隣にあり、世界遺産の社寺がある市は？",["日光市","那須塩原市","小山市"],0],["宇都宮市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["宇都宮市が餃子のほかにアピールしている音楽文化は？",["ジャズ","演歌","雅楽"],0],["宇都宮市の昼夜間人口比は100より？",["大きい","小さい","ちょうど100"],0]],"大分市":[["大分県が源泉数で全国1位を誇るものは？",["温泉","ダム","火山"],0],["大分市の佐賀関で水揚げされる有名なブランド魚は？",["関あじ・関さば","大間のマグロ","氷見のぶり"],0],["大分発祥といわれる、鶏肉の天ぷら料理は？",["とり天","チキン南蛮","手羽先"],0],["大分市の高崎山で有名な動物は？",["ニホンザル","シカ","クマ"],0],["大分市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["大分市の臨海部で盛んな産業は？",["鉄鋼・石油化学","造船","繊維"],0],["大分市を流れる川は？",["大分川","筑後川","球磨川"],0],["大分市の佐賀関と愛媛県の佐田岬の間の海は？",["豊予海峡","関門海峡","鳴門海峡"],0],["大分県が全国生産量のほとんどを占める柑橘は？",["カボス","ゆず","すだち"],0],["大分市に通るJRの路線は？",["日豊本線","東海道本線","山陽本線"],0]],"金沢市":[["金沢市にある日本三名園の一つは？",["兼六園","後楽園","偕楽園"],0],["金沢市が国内生産のほとんどを占める工芸材料は？",["金箔","銀箔","和紙"],0],["江戸時代、金沢を治めた藩は？",["加賀藩","薩摩藩","長州藩"],0],["北陸新幹線が金沢まで延伸開業した年は？",["2015年","2005年","2020年"],0],["金沢市にある円形の現代美術館は？",["21世紀美術館","森美術館","国立新美術館"],0],["「金沢の台所」と呼ばれる市場は？",["近江町市場","築地市場","黒門市場"],0],["金沢市の郷土料理は？",["治部煮","ひつまぶし","ほうとう"],0],["金沢市の中心部を流れる川は犀川とあと一つは？",["浅野川","信濃川","黒部川"],0],["金沢市の人口は、北陸三県（富山・石川・福井）の市で？",["最も多い","2番目","3番目"],0],["金沢市で毎年6月ごろに行われる祭りは？",["百万石まつり","ねぶた祭","竿燈まつり"],0]],"つくば市":[["つくば市に多く集まっているのは？",["研究機関","港","工場"],0],["つくば市と東京の秋葉原を結ぶ鉄道は？",["つくばエクスプレス","京成線","東武線"],0],["「西の富士、東の筑波」と呼ばれる、つくば市の山は？",["筑波山","高尾山","赤城山"],0],["1985年につくば市で開かれた万博は？",["科学万博（つくば博）","大阪万博","愛知万博"],0],["つくば市にあるJAXAの施設は？",["筑波宇宙センター","種子島宇宙センター","相模原キャンパス"],0],["つくば市にある、気象の研究機関は？",["気象研究所","海洋研究開発機構","国立天文台"],0],["つくば市の外国人住民の割合は、全国の市と比べて？",["高い","低い","ほぼゼロ"],0],["つくば市が誕生した年は？",["1987年","1950年","2005年"],0],["つくば駅から秋葉原まで、つくばエクスプレスでおよそ何分？",["約45分","約20分","約90分"],0],["つくば市のように、研究機関を集めて計画的につくられた都市を何という？",["研究学園都市","港湾都市","城下町"],0]]});
+Object.assign(QZ,{"千葉市":[["千葉市は何に指定されている？",["政令指定都市","中核市","特別区"],0],["千葉市にある、日本最大級の展示場は？",["幕張メッセ","東京ビッグサイト","インテックス大阪"],0],["千葉市を本拠地とするプロ野球チームは？",["千葉ロッテマリーンズ","埼玉西武ライオンズ","オリックス・バファローズ"],0],["千葉市にある、世界最長級の懸垂式の交通機関は？",["千葉都市モノレール","ゆりかもめ","東京モノレール"],0],["千葉市の区の数は？",["6区","7区","10区"],0],["千葉市の海沿いにある再開発エリアは？",["幕張新都心","みなとみらい21","天保山"],0],["千葉市の人口は千葉県内で？",["最も多い","2番目","3番目"],0],["千葉市が政令指定都市になった年は？",["1992年","1972年","2012年"],0],["千葉駅に乗り入れるJRの路線は？",["総武線","東海道線","中央線"],0],["千葉市にある、日本初の人工海浜として知られる海岸は？",["稲毛海岸","九十九里浜","湘南海岸"],0]],"北九州市":[["北九州市は何に指定されている？",["政令指定都市","中核市","特別区"],0],["北九州市の工業発展のもとになった製鉄所は？",["官営八幡製鉄所","釜石製鉄所","室蘭製鉄所"],0],["北九州市と本州の下関市を隔てる海峡は？",["関門海峡","鳴門海峡","津軽海峡"],0],["北九州市の門司港エリアの名物料理は？",["焼きカレー","ちゃんぽん","ひつまぶし"],0],["北九州市の人口は九州の市で何番目？",["2番目","1番目","3番目"],0],["北九州市に本社がある、衛生陶器の大手メーカーは？",["TOTO","LIXIL","パナソニック"],0],["小倉城がある北九州市の区は？",["小倉北区","門司区","八幡東区"],0],["北九州市の区の数は？",["7区","5区","10区"],0],["北九州市と下関市を結ぶ、海底の道は？",["関門トンネル","青函トンネル","アクアライン"],0],["北九州市の若松区で、石炭の積み出しで栄えた港は？",["若松港","博多港","神戸港"],0]],"堺市":[["堺市は何に指定されている？",["政令指定都市","中核市","特別区"],0],["堺市にある世界遺産の巨大な古墳は？",["仁徳天皇陵古墳","箸墓古墳","高松塚古墳"],0],["堺市の伝統産業で有名な道具は？",["包丁","ガラス","漆器"],0],["堺市の人口は大阪府内で？",["2番目","1番目","3番目"],0],["堺市の区の数は？",["7区","5区","10区"],0],["戦国時代、堺が国際貿易で栄えた都市のタイプは？",["自治都市","宿場町","門前町"],0],["堺市を走る大阪の私鉄は？",["南海電鉄","阪急電鉄","京阪電鉄"],0],["堺市に本社を置く、自転車部品で世界的な企業は？",["シマノ","ヤマハ発動機","ブリヂストン"],0],["堺市の臨海部に広がる工業地帯は？",["阪神工業地帯","京浜工業地帯","中京工業地帯"],0],["堺市が含まれる、世界遺産の古墳群の名前は？",["百舌鳥・古市古墳群","纒向古墳群","吉野ヶ里遺跡"],0]],"新潟市":[["新潟市が名産地として知られる農産物は？",["米","みかん","りんご"],0],["新潟市を流れる、日本一長い川は？",["信濃川","利根川","石狩川"],0],["新潟市は何に指定されている？",["政令指定都市","中核市","特別区"],0],["信濃川の河口にかかる、新潟市の有名な橋は？",["萬代橋","レインボーブリッジ","瀬戸大橋"],0],["新潟市の区の数は？",["8区","5区","10区"],0],["新潟市の郷土料理は？",["のっぺ","ひつまぶし","ほうとう"],0],["新潟駅に停まる新幹線は？",["上越新幹線","東北新幹線","北陸新幹線"],0],["新潟市で毎年8月に開かれる大きな祭りは？",["新潟まつり","ねぶた祭","竿燈まつり"],0],["新潟市の古町で有名な伝統文化は？",["古町芸妓","歌舞伎","能"],0],["新潟市から佐渡島へ向かうときに使う乗り物は？",["フェリー","橋","ロープウェイ"],0]],"浜松市":[["浜松市は何に指定されている？",["政令指定都市","中核市","特別区"],0],["浜松市に本社を置く、軽自動車でも有名な自動車メーカーは？",["スズキ","トヨタ","マツダ"],0],["浜松市の名物として有名な魚料理は？",["うなぎ","ひつまぶし","さばの味噌煮"],0],["浜松市の西にある湖は？",["浜名湖","琵琶湖","霞ヶ浦"],0],["浜松市の面積は、全国の市の中で何番目に広い？",["2番目","1番目","10番目"],0],["浜松市で毎年5月に行われる、凧揚げで有名な祭りは？",["浜松まつり","祇園祭","ねぶた祭"],0],["浜松市が「楽器の街」と呼ばれる、代表的な楽器は？",["ピアノ","三味線","尺八"],0],["浜松駅に停まる新幹線は？",["東海道新幹線","東北新幹線","北陸新幹線"],0],["浜松市の外国人住民の割合は、他の政令指定都市と比べて？",["高い","低い","ほぼゼロ"],0],["アカウミガメが産卵に訪れる、浜松市の砂丘は？",["中田島砂丘","鳥取砂丘","九十九里浜"],0]],"静岡市":[["静岡市が名産地として全国的に知られる農産物は？",["お茶","ぶどう","りんご"],0],["静岡市は何に指定されている？",["政令指定都市","中核市","特別区"],0],["静岡市の駿河湾の名産の小さなえびは？",["桜えび","甘えび","伊勢えび"],0],["静岡市を本拠地とするJリーグのクラブは？",["清水エスパルス","ジュビロ磐田","アルビレックス新潟"],0],["徳川家康が晩年を過ごした、静岡市の城は？",["駿府城","浜松城","岡崎城"],0],["静岡市の区の数は？",["3区","5区","7区"],0],["静岡市が「ホビーの街」と呼ばれる理由の産業は？",["プラモデル","造船","陶器"],0],["静岡市の三保松原は、何の構成資産として世界遺産に登録されている？",["富士山","屋久島","白神山地"],0],["静岡おでんの特徴的な具は？",["黒はんぺん","白玉","もち"],0],["静岡市の人口は静岡県内で？",["2番目","1番目","3番目"],0]],"船橋市":[["船橋市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["船橋市にある、日本初の「ららぽーと」は？",["ららぽーとTOKYO-BAY","イオンレイクタウン","ラゾーナ川崎"],0],["船橋市を拠点に活動する非公認キャラクターは？",["ふなっしー","くまモン","ひこにゃん"],0],["船橋市にある競馬場は？",["中山競馬場","東京競馬場","京都競馬場"],0],["船橋市の人口は千葉県内で？",["2番目","1番目","3番目"],0],["船橋市の昼夜間人口比は100より？",["小さい","大きい","ちょうど100"],0],["船橋駅に乗り入れるJRの路線は？",["総武線","常磐線","中央線"],0],["船橋市の沖にある三番瀬は、何で有名？",["干潟","砂丘","サンゴ礁"],0],["船橋市が江戸時代から産地として知られる果物は？",["梨","みかん","ぶどう"],0],["船橋市の海苔や貝の産地としての歴史が長い海は？",["東京湾","相模湾","伊勢湾"],0]],"川口市":[["川口市の伝統産業は？",["鋳物","織物","陶器"],0],["川口市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["川口市の南で荒川をはさんで隣り合う都県は？",["東京都","神奈川県","千葉県"],0],["川口市の外国人住民の割合は、県内の市の中で？",["高い","低い","ほぼゼロ"],0],["川口市の人口は埼玉県内で？",["2番目","1番目","3番目"],0],["京浜東北線の駅は？",["川口駅","蕨駅","赤羽駅"],0],["映画「キューポラのある街」の「キューポラ」とは？",["鋳物を溶かす炉","煙突","橋"],0],["川口市の安行が名産地として知られるものは？",["植木","ぶどう","お茶"],0],["川口市の昼夜間人口比は100より？",["小さい","大きい","ちょうど100"],0],["川口市の人口密度は、全国の主な市と比べて？",["高い","低い","ほぼ同じ"],0]],"鹿児島市":[["鹿児島市のシンボルの火山は？",["桜島","阿蘇山","雲仙岳"],0],["鹿児島市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["鹿児島市出身で、明治維新で活躍した人物は？",["西郷隆盛","坂本龍馬","吉田松陰"],0],["鹿児島市の名物として有名な豚肉は？",["黒豚","馬刺し","ジンギスカン"],0],["鹿児島市の名物の焼酎の主な原料は？",["さつまいも","米","麦"],0],["鹿児島市と桜島を結ぶ乗り物は？",["フェリー","ロープウェイ","橋"],0],["鹿児島市の人口は九州の市で何番目？",["4番目","2番目","6番目"],0],["鹿児島市の中心部を走る路面電車は？",["鹿児島市電","広島電鉄","熊本市電"],0],["桜島の噴火で降る灰を何という？",["降灰","黄砂","煤"],0],["鹿児島市の天文館は何で有名？",["繁華街","港","工場"],0]],"姫路市":[["姫路市にある世界遺産の城は？",["姫路城","熊本城","松本城"],0],["姫路城の別名は？",["白鷺城","烏城","鯉城"],0],["姫路市は何に指定されている？",["中核市","政令指定都市","特別区"],0],["姫路市の人口は兵庫県内で？",["2番目","1番目","3番目"],0],["姫路おでんの薬味として知られるのは？",["しょうが醤油","からし","七味"],0],["姫路駅に停まる新幹線は？",["山陽新幹線","東海道新幹線","東北新幹線"],0],["姫路市の臨海部に広がる工業地域は？",["播磨臨海工業地域","京浜工業地帯","京葉工業地域"],0],["姫路市の名産の革は？",["白なめし革","西陣織","友禅"],0],["姫路市で秋に行われる勇壮な祭りは？",["灘のけんか祭り","祇園祭","ねぶた祭"],0],["姫路城の天守が築かれた主な時代は？",["江戸時代初期","平安時代","明治時代"],0]]});
 const ITEMS=[
 {id:"heal",n:"🩹 応急処置",d:"HP+40"},
 {id:"reroll",n:"🔄 引き直し券",d:"選択肢の引き直し+1回"},
@@ -95,35 +115,136 @@ const asked=new Set();
 let MAXP=150;
 const DIFF=[{n:"🟢 初級",hp:200,max:999,inv:3},{n:"🟡 中級",hp:150,max:100,inv:3},{n:"🔴 上級",hp:100,max:85,inv:3},{n:"👹 鬼級",hp:70,oni:1,inv:1},{n:"🗾 地理系",hp:50,geo:1,inv:1}];
 const tier=x=>C[x].hp<=80?1:C[x].hp<=100?2:3;
-const eligible=d=>ALL.filter(k=>d.geo?!!C[k].geo:d.oni?!!C[k].oni:(!C[k].oni&&!C[k].geo&&C[k].hp<=d.max));
+const eligible=d=>ALL.filter(k=>d.geo?!!C[k].geo:d.oni?!!C[k].oni:(!C[k].oni&&!C[k].geo&&!C[k].en&&C[k].hp<=d.max));
 let diff=0;
 const $=id=>document.getElementById(id);
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const dmg=(a,b,i)=>Math.max(3,Math.min(100,Math.round(40*Math.pow(C[a].s[i]/C[b].s[i],EXP[i]))));
 const fmt=(c,i)=>C[c].s[i]+U[i];
-let me,order,ei,en,ehp,php,lock,cur=[],rerolls=1,inv=[],boost=false,barrier=false,flash=false,tax=false;
+let me,order,ei,en,ehp,php,lock,cur=[],rerolls=1,inv=[],boost=false,barrier=false,flash=false,tax=false,TA=false,tleft=90,tTimer,kills=0,taOver=false,taOrder=[];
+const alive=()=>!(TA&&taOver);
+const DL=()=>TA?900:1800;
 function btns(list,fn,grid){const o=$("opts");o.innerHTML="";o.style.cssText=grid?"display:grid;grid-template-columns:1fr 1fr;gap:8px":"";list.forEach((t,i)=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>fn(i);o.appendChild(b)});}
-function bars(){$("pbar").style.width=Math.max(0,php)/MAXP*100+"%";$("php").textContent="HP "+Math.max(0,php);if(en){$("ebar").style.width=Math.max(0,ehp)/C[en].hp*100+"%";$("ehp").textContent="HP "+Math.max(0,ehp);}}
+function bars(){$("pbar").style.width=Math.max(0,php)/MAXP*100+"%";$("php").textContent=TA?"":"HP "+Math.max(0,php);if(en){$("ebar").style.width=Math.max(0,ehp)/C[en].hp*100+"%";$("ehp").textContent="HP "+Math.max(0,ehp);}}
 function shake(){const em=$("em");em.classList.remove("hit");void em.offsetWidth;em.classList.add("hit");}
-function select(){setScene("menu");
+function select(){setScene("menu");TA=false;taOver=false;clearInterval(tTimer);$("tm").style.display="none";$("pbar").parentNode.style.display="";{const cw=$("cardwrap");if(cw)cw.remove();document.querySelector(".stage").style.display="";}
   en=null;php=MAXP;me=null;
   $("pn").textContent="あなた";$("pbar").style.width="100%";$("php").textContent="";
   $("em").textContent="🏙️";$("en").textContent="";$("ehp").textContent="";$("ebar").style.width="0";
-  $("msg").textContent="";$("q").textContent="難易度を選ぼう";
-  btns(DIFF.map(d=>d.n+"（HP"+d.hp+"・"+eligible(d).length+"都市から選べる）"),i=>{diff=i;pickCity();});
-  const gi=DIFF.findIndex(d=>d.geo);if(gi>=0)document.querySelectorAll("#opts button")[gi].classList.add("danger");
+  $("msg").textContent="";$("q").textContent="モードを選ぼう";
+  btns(["⚔️ 通常モード","⏱ タイムアタック（90秒）"],i=>{TA=i===1;pickDiff();});
+}
+const TAC=[["東京23区","大阪市","横浜市","名古屋市"],["福岡市","札幌市","神戸市","京都市"],["川崎市","さいたま市","広島市","仙台市"],["相模原市","八王子市"]];
+const taCities=d=>TAC[DIFF.indexOf(d)]||[];
+function pickDiff(){
+  $("q").textContent=(TA?"⏱ タイムアタック：":"")+"難易度を選ぼう";
+  const L=TA?DIFF.filter(d=>!d.geo):DIFF;
+  btns(L.map(d=>d.n+(TA?"（"+taCities(d).length+"都市から選べる）":"（HP"+d.hp+"・"+eligible(d).length+"都市から選べる）")).concat(["← モードにもどる"]),i=>{if(i>=L.length)return select();diff=DIFF.indexOf(L[i]);pickCity();});
+  if(!TA){const gi=DIFF.findIndex(d=>d.geo);if(gi>=0)document.querySelectorAll("#opts button")[gi].classList.add("danger");}
 }
 function pickCity(){
   $("q").textContent=DIFF[diff].n+"：どの都市で戦う？";
-  const L=eligible(DIFF[diff]);
-  btns(L.map(k=>C[k].e+" "+k).concat(["← 難易度にもどる"]),i=>i<L.length?start(L[i]):select(),true);
+  const L=TA?taCities(DIFF[diff]):eligible(DIFF[diff]);
+  btns(L.map(k=>C[k].e+" "+k).concat(["← 難易度にもどる"]),i=>i<L.length?start(L[i]):pickDiff(),true);
 }
-function start(k){setScene(DIFF[diff].geo?"geo":"battle");
-  me=k;const T=n=>shuf(ALL.filter(x=>x!==k&&tier(x)===n));order=[...T(1).slice(0,2),...T(2).slice(0,2),...T(3).slice(0,1)];
+function start(k){setScene(DIFF[diff].geo?"geo":TA?"ta":"battle");
+  me=k;const T=n=>shuf(ALL.filter(x=>x!==k&&!C[x].ta&&tier(x)===n));order=[...T(1).slice(0,2),...T(2).slice(0,2),...T(3).slice(0,1)];
   asked.clear();ei=0;MAXP=DIFF[diff].hp;php=MAXP;rerolls=1;inv=[];boost=false;barrier=false;flash=false;tax=false;
-  $("pn").textContent=C[k].e+" "+k;spawn();
+  $("pn").textContent=C[k].e+" "+k;if(TA)taInit();spawn();
 }
-function spawn(){en=order[ei];ehp=C[en].hp;$("em").textContent=C[en].e;$("en").textContent=en+"（"+(ei+1)+"/"+order.length+"）"+(ei===order.length-1?" 👑ボス":"");$("msg").textContent=en+"があらわれた！";turnP();}
+function spawn(){en=TA?pickTA(ei+1):order[ei];ehp=C[en].hp;$("em").textContent=C[en].e;$("en").textContent=en+(TA?"（"+(ei+1)+"体目）"+(ei+1>=18&&(ei+1)%3===0?" ⚠️激強":""):"（"+(ei+1)+"/"+order.length+"）"+(ei===order.length-1?" 👑ボス":""));$("msg").textContent=en+"があらわれた！";turnP();}
+function taBonus(n){return n>=18&&n%3===0?15:n<=5?4:n<=15?6:9;}
+function buildTA(){
+  const rest=shuf(ALL.filter(x=>x!==me)).sort((a,b)=>C[a].hp-C[b].hp);
+  const A=shuf(rest.slice(0,5)),B=shuf(rest.slice(5,15)),G=rest.slice(15);
+  const top=shuf(G.splice(-4)),o=shuf(G);
+  taOrder=[...A,...B];
+  for(let n=16;n<=rest.length;n++)taOrder.push(n%3===0?(top.shift()||o.shift()):(o.shift()||top.shift()));
+  taOrder=taOrder.filter(Boolean);
+}
+function pickTA(n){return taOrder[n-1];}
+function showT(){$("tm").textContent="⏱ "+Math.ceil(tleft)+"秒　"+kills+"体";$("tm").className="tm"+(tleft<=15?" low":"");}
+function taInit(){
+  buildTA();MAXP=99999;php=MAXP;kills=0;tleft=90;taOver=false;
+  $("pbar").parentNode.style.display="none";$("tm").style.display="block";showT();
+  clearInterval(tTimer);let last=performance.now();
+  tTimer=setInterval(()=>{const n=performance.now();if(!taOver)tleft-=(n-last)/1000;last=n;if(tleft<=0){tleft=0;showT();taEnd();}else showT();},100);
+}
+function taKill(){
+  kills++;if(kills>=taOrder.length)return taEnd(true);const b=taBonus(ei+1);tleft+=b;
+  const p=ei+1<=5?0.3:ei+1<=15?0.5:0.8;
+  let m=en+"をたおした！ 時間+"+b+"秒";
+  if(Math.random()<p){const pool=ITEMS.filter(x=>(x.id!=="flash"&&x.id!=="tax")||Math.random()<0.2);const it=shuf(pool)[0];inv.push(it);if(inv.length>DIFF[diff].inv)inv.shift();m+="　💰"+it.n+"をひろった";}
+  $("msg").textContent=m;showT();seDown();ei++;
+  setTimeout(()=>{if(alive())spawn();},700);
+}
+function taTitle(k,all){
+  const dn=["初級","中級","上級","鬼級"][diff]||"";
+  if(all)return {t:dn+"マスター",n:0};
+  const L=[[16,"知識豊富な地理系"],[11,"地図帳の読者"],[6,"都市マニア"],[0,"道に迷った旅人"]];
+  const t=L.find(x=>k>=x[0]),nx=[...L].reverse().find(x=>x[0]>k);
+  return {t:t[1],n:nx?nx[0]-k:taOrder.length-k};
+}
+function showCard(all){
+  const old=$("cardwrap");if(old)old.remove();
+  const r=taTitle(kills,all),dn=["初級","中級","上級","鬼級"][diff]||"";
+  const cv=document.createElement("canvas");cv.width=1080;cv.height=1080;
+  const g=cv.getContext("2d");
+  const idx=all?4:kills>=16?3:kills>=11?2:kills>=6?1:0;
+  const P=[["#2b2f3a","#4b5563","#cbd5e1"],["#10294d","#1e5aa8","#7dd3fc"],["#0f3d2e","#1f8a5b","#86efac"],["#2a1250","#6d28d9","#d8b4fe"],["#5a3b00","#d99a00","#ffe27a"]][idx];
+  const gr=g.createLinearGradient(0,0,1080,1080);gr.addColorStop(0,P[0]);gr.addColorStop(1,P[1]);
+  g.fillStyle=gr;g.fillRect(0,0,1080,1080);
+  if(idx>=3){g.save();g.translate(540,500);for(let i=0;i<24;i++){g.rotate(Math.PI/12);g.fillStyle="rgba(255,255,255,0.06)";g.beginPath();g.moveTo(0,0);g.lineTo(1200,-70);g.lineTo(1200,70);g.closePath();g.fill();}g.restore();}
+  g.lineWidth=14;g.strokeStyle=P[2];g.strokeRect(40,40,1000,1000);g.lineWidth=3;g.strokeRect(66,66,948,948);
+  const F="'Hiragino Sans','Noto Sans JP',system-ui,-apple-system,sans-serif";
+  g.textAlign="center";g.textBaseline="middle";
+  g.fillStyle=P[2];g.font="bold 46px "+F;g.fillText(all?"ALL CLEAR":"TIME ATTACK",540,150);
+  if(idx===4){g.font="170px "+F;g.fillStyle="#fff";g.fillText("👑",540,300);}
+  g.font="bold 40px "+F;g.fillStyle="rgba(255,255,255,.85)";g.fillText("獲得称号",540,idx===4?430:340);
+  let fs=150;g.font="900 "+fs+"px "+F;
+  while(g.measureText(r.t).width>900&&fs>40){fs-=4;g.font="900 "+fs+"px "+F;}
+  const ty=idx===4?560:520;
+  g.shadowColor=P[2];g.shadowBlur=idx>=3?40:18;g.fillStyle="#fff";g.fillText(r.t,540,ty);g.shadowBlur=0;
+  g.lineWidth=4;g.strokeStyle=P[2];g.strokeText(r.t,540,ty);
+  g.font="bold 64px "+F;g.fillStyle=P[2];g.fillText(all?"全"+kills+"都市を制覇！":kills+"体たおした！",540,ty+150);
+  g.font="bold 44px "+F;g.fillStyle="#fff";g.fillText(C[me].e+" "+me+"　｜　"+dn,540,ty+250);
+  if(all){g.font="36px "+F;g.fillStyle="rgba(255,255,255,.8)";g.fillText("残り"+Math.ceil(tleft)+"秒",540,ty+310);}
+  g.font="bold 40px "+F;g.fillStyle=P[2];g.fillText("都市バトル",540,960);
+  g.font="28px "+F;g.fillStyle="rgba(255,255,255,.6)";g.fillText(new Date().toLocaleDateString("ja-JP"),540,1005);
+  const txt="【都市バトル】タイムアタック（"+dn+"）で称号「"+r.t+"」を獲得！"+kills+"体たおした！"+(all?"全都市制覇！":"")+" #都市バトル #地理系 "+location.href.split("#")[0];
+  const w=document.createElement("div");w.id="cardwrap";
+  const img=document.createElement("img");img.alt="称号カード";img.src=cv.toDataURL("image/png");w.appendChild(img);
+  const row=document.createElement("div");row.className="row2";
+  const b1=document.createElement("button");b1.textContent="📷 画像を保存";
+  const b2=document.createElement("button");b2.textContent="𝕏 共有";
+  const mk=cb=>cv.toBlob(bl=>cb(new File([bl],"toshi-battle.png",{type:"image/png"}),bl));
+  const intent=()=>window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt),"_blank");
+  b1.onclick=()=>mk((f,bl)=>{
+    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(()=>{});}
+    else{const a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="toshi-battle.png";document.body.appendChild(a);a.click();a.remove();}
+  });
+  b2.onclick=()=>mk(f=>{
+    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],text:txt}).catch(e=>{if(!e||e.name!=="AbortError")intent();});}
+    else intent();
+  });
+  row.appendChild(b1);row.appendChild(b2);w.appendChild(row);
+  const h=document.createElement("div");h.className="hint";h.textContent="画像を長押しでも保存できるよ。Xには、保存した画像を添付して投稿してね";w.appendChild(h);
+  $("q").parentNode.insertBefore(w,$("q"));
+  document.querySelector(".stage").style.display="none";
+}
+function taEnd(all){
+  if(taOver)return;taOver=true;lock=true;clearInterval(tTimer);$("tm").style.display="none";
+  let best=0;const key="cb_ta_"+DIFF[diff].n;
+  try{best=+localStorage.getItem(key)||0;}catch(e){}
+  const nr=kills>best;
+  if(nr){try{localStorage.setItem(key,String(kills));}catch(e){}}
+  setScene("none");(nr||all===true?jingleWin:jingleLose)();showCard(all===true);
+  $("em").textContent=all===true?"👑":"⏱";$("en").textContent="";$("ehp").textContent="";$("ebar").style.width="0";
+  $("q").textContent=(all===true?"全都市制覇！ ":"時間切れ！ ")+kills+"体たおした！"+(nr?" 🎉自己ベスト更新！":"（自己ベスト："+best+"体）");
+  const r=taTitle(kills,all===true),n=kills+1,z=n<=5?"弱":n<=15?"中":n>=18&&n%3===0?"激強":"強";$("msg").textContent="🏅 称号「"+r.t+"」"+(all===true?"　残り"+Math.ceil(tleft)+"秒":"　"+(kills>=16?"マスターまであと":"次の称号まであと")+r.n+"体")+"（"+me+"／"+DIFF[diff].n+"）"+(all===true?"":"　最後の敵："+n+"体目（"+z+"）");
+  const o=$("opts");o.innerHTML="";o.style.cssText="";
+  const b=document.createElement("button");b.className="big";b.textContent="もう一度あそぶ";b.onclick=select;o.appendChild(b);
+}
 function draw(){const all=[...Array(M.length).keys()];const pool=all.filter(i=>!cur.includes(i));cur=shuf(pool.length>=3?pool:all).slice(0,3);}
 function turnP(){cur=[];draw();showP();}
 function showP(){
@@ -131,18 +252,18 @@ function showP(){
   btns(cur.map(i=>M[i]+"で攻める"),k=>pickP(cur[k]));
   const o=$("opts");
   if(rerolls>0){const r=document.createElement("button");r.textContent="🔄 選択肢を引き直す（残り"+rerolls+"回）";r.style.fontSize="14px";r.onclick=()=>{if(lock)return;rerolls--;draw();showP();};o.appendChild(r);}
-  inv.forEach((it,idx)=>{const b=document.createElement("button");b.textContent="🎒 "+it.n+"を使う（"+it.d+"）";b.style.fontSize="14px";b.onclick=()=>useItem(idx);o.appendChild(b);});
+  inv.forEach((it,idx)=>{const b=document.createElement("button");b.textContent="🎒 "+it.n+"を使う（"+(TA&&it.id==="heal"?"時間+10秒":it.d)+"）";b.style.fontSize="14px";b.onclick=()=>useItem(idx);o.appendChild(b);});
 }
 function useItem(idx){
   if(lock)return;
   const it=inv.splice(idx,1)[0];
-  if(it.id==="heal")php=Math.min(MAXP,php+40);
+  if(it.id==="heal"){if(TA)tleft+=10;else php=Math.min(MAXP,php+40);}
   if(it.id==="reroll")rerolls++;
   if(it.id==="boost")boost=true;
   if(it.id==="barrier")barrier=true;
   if(it.id==="flash")flash=true;
   if(it.id==="tax")tax=true;
-  showP();$("msg").textContent=it.n+"を使った！ "+it.d;
+  showP();$("msg").textContent=it.n+"を使った！ "+(TA&&it.id==="heal"?"時間+10秒":it.d);
 }
 function pickP(i){
   if(lock)return;lock=true;
@@ -153,12 +274,14 @@ function pickP(i){
   $("msg").textContent=l+(bo?"（🔥1.5倍）":"")+"　"+me+" "+fmt(me,i)+" vs "+en+" "+fmt(en,i)+" → "+d+"ダメージ";
   shake();bars();
   setTimeout(()=>{
+    if(!alive())return;
     if(ehp<=0){
+      if(TA)return taKill();
       if(ei===order.length-1)return end(true);
       return reward();
     }
     turnE();
-  },1800);
+  },DL());
 }
 function reward(){seDown();
   php=Math.min(MAXP,php+30);bars();
@@ -182,10 +305,10 @@ function ansE(ok,i,ans){
   document.querySelectorAll("#opts button").forEach(x=>x.disabled=true);
   let d=Math.round(dmg(en,me,i)*0.5);if(ok)d=Math.round(d/2);
   const ba=barrier;if(ba){d=Math.round(d/2);barrier=false;}
-  d=Math.max(2,d);const fl=flash&&ok;if(flash)flash=false;if(fl)d=0;php-=d;seHurt(d);
-  $("msg").textContent=(ok?"正解！ ダメージ半減　":"不正解…（答え："+ans+"）　")+(ba?"🛡️バリア！ ":"")+(fl?"✨閃光で完全回避！ ":"")+en+" "+fmt(en,i)+" vs "+me+" "+fmt(me,i)+" → "+d+"ダメージ";
+  d=Math.max(2,d);const fl=flash&&ok;if(flash)flash=false;if(fl)d=0;if(TA){d=d>0?Math.max(1,Math.round(d/5)):0;tleft-=d;showT();}else php-=d;seHurt(d);
+  $("msg").textContent=(ok?"正解！ ダメージ半減　":"不正解…（答え："+ans+"）　")+(ba?"🛡️バリア！ ":"")+(fl?"✨閃光で完全回避！ ":"")+en+" "+fmt(en,i)+" vs "+me+" "+fmt(me,i)+" → "+d+(TA?"秒減る":"ダメージ");
   shake();bars();
-  setTimeout(()=>{if(php<=0)end(false);else turnP();},1800);
+  setTimeout(()=>{if(!alive())return;if(php<=0)end(false);else turnP();},DL());
 }
 function end(win){setScene("none");(win?jingleWin:jingleLose)();
   $("em").textContent=win?"🏆":"😵";
@@ -232,7 +355,23 @@ function playGeo(s,t){
   if(bar<3&&(i===4||i===12))noise(t,0.1,0.35,1500);
   if(bar===3&&i>=8)noise(t,0.05,0.15+(i-8)*0.04,2000);
 }
-const TRACKS={menu:{len:0.1,play:playMenu},battle:{len:0.088,play:playBattle},geo:{len:0.083,play:playGeo},none:{len:0.1,play:()=>{}}};
+const TAS=[659.25,698.46,830.61,880,987.77,1046.5,1174.66,1318.5];
+const TAM=[[0,1,2,1,0,1,2,3,2,1,0,1,2,3,4,3],[4,3,2,3,4,5,4,3,2,3,2,1,0,1,2,1],[0,1,2,3,4,5,6,7,6,5,4,3,2,1,0,-1],[7,6,7,5,6,4,5,3,4,2,3,1,2,0,1,0]];
+const TAR=[82.41,82.41,110,123.47];
+const TAC2=[[164.81,207.65,246.94],[164.81,207.65,246.94],[220,261.63,329.63],[246.94,311.13,369.99]];
+function playTA(s,t){
+  const bar=Math.floor(s/16)%4,i=s%16;
+  if(s%64===0)noise(t,0.45,0.25,5000);
+  if(i%8===0)tone(TAR[bar],t,0.1,"sawtooth",0.18);
+  if(i%8===4)TAC2[bar].forEach(f=>tone(f,t,0.07,"sawtooth",0.055));
+  const m=TAM[bar][i];
+  if(m>=0){tone(TAS[m],t,0.05,"square",0.07);tone(TAS[m]/2,t,0.05,"sawtooth",0.03);}
+  if(i===0||i===8)kick(t);
+  if(i%8===4&&!(bar===3&&i>=8))noise(t,0.1,0.45,1500);
+  if(i%2===0)noise(t,0.025,0.1,8000);
+  if(bar===3&&i>=8)noise(t,0.05,0.15+(i-8)*0.04,2000);
+}
+const TRACKS={menu:{len:0.1,play:playMenu},battle:{len:0.088,play:playBattle},geo:{len:0.083,play:playGeo},ta:{len:0.075,play:playTA},none:{len:0.1,play:()=>{}}};
 function sweep(f1,f2,t,d,type,v){const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+0.02);}
 function sndOn(){return ac&&bgmOn;}
 function seHit(d){if(!sndOn())return;const t=ac.currentTime+0.1;noise(t,0.15,d>=70?0.7:0.45,600);sweep(d>=70?500:300,60,t,0.18,"sawtooth",0.25);if(d>=70)tone(1200,t+0.05,0.12,"square",0.1);}
